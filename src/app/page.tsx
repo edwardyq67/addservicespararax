@@ -141,7 +141,28 @@ console.log(scrollFractionPorcentual)
         <div className="absolute inset-0 pointer-events-none z-25" style={{ background: 'linear-gradient(180deg, transparent 70%, black 85%, black 100%)' }} />
       </section>
       <Servicios scrollFractionPorcentual={scrollFractionPorcentual}/>
-    
+       {/* Segunda sección */}
+      <section className="relative h-screen z-10 flex items-center justify-center md:justify-end">
+        <SimpleParallax scale={1.3} orientation="down" delay={0.4} transition="cubic-bezier(0,0,0,1)" overflow={true}>
+          <div className="max-w-4xl mx-auto text-center md:text-right px-4 md:pr-16 lg:pr-32">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Physical AI platforms that move
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">industries forward</span>
+            </h2>
+            <p className="text-lg md:text-xl text-white/70 mb-8 max-w-2xl mx-auto md:mx-0 md:ml-auto">
+              Transformando industrias con inteligencia artificial física
+            </p>
+            <SimpleParallax scale={1.1} orientation="up" delay={0.2} transition="cubic-bezier(0,0,0,1)" overflow={true}>
+              <div className="inline-block md:block">
+                <motion.button className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} onClick={() => window.location.href = "#contacto"}>
+                  Descubre el futuro <span className="ml-2">→</span>
+                </motion.button>
+              </div>
+            </SimpleParallax>
+          </div>
+        </SimpleParallax>
+      
+      </section>
     </div>
   );
 }
