@@ -62,11 +62,11 @@ export default function Servicios({ scrollFractionPorcentual }) {
     const positionClass = 
         scrollFractionPorcentual > 33 && scrollFractionPorcentual <= 90
             ? "fixed justify-center" 
-            : "sticky justify-start"
+            : "sticky justify-start "
 
     return (
         <div ref={containerRef} className="relative h-[400vh]">
-            <div className={`${positionClass} top-0 items-center overflow-visible`}>
+            <div className={`${positionClass} top-0 items-center overflow-visible flex gap-32`}>
                 <motion.div
                     className="flex will-change-transform"
                     style={{ x }}
@@ -105,6 +105,7 @@ export default function Servicios({ scrollFractionPorcentual }) {
                     
 
                 </motion.div>
+                
             </div>
         </div>
     )
