@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -8,34 +8,120 @@ gsap.registerPlugin(ScrollTrigger);
 
 function Paralax() {
     const sectionRef = useRef(null);
+    const fixedRef = useRef(null);
     const videoRef = useRef(null);
 
+    const [displayText, setDisplayText] = useState("SmartFros ❄️");
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    const textos = [
+        "SmartFrost ❄️",
+        "Control de temperatura en tiempo real",
+        "Monitoreo inteligente 24/7",
+        "Eficiencia energética garantizada"
+    ];
+
+    // 🔥 EFECTO SCRAMBLE
+    const animateTextChange = (newText) => {
+        if (isAnimating) return;
+
+        setIsAnimating(true);
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        let currentStep = 0;
+        const totalSteps = 20;
+
+        const interval = setInterval(() => {
+            currentStep++;
+            let randomText = "";
+
+            for (let i = 0; i < newText.length; i++) {
+                if (currentStep > totalSteps * (i / newText.length)) {
+                    randomText += newText[i];
+                } else {
+                    randomText += chars[Math.floor(Math.random() * chars.length)];
+                }
+            }
+
+            setDisplayText(randomText);
+
+            if (currentStep >= totalSteps) {
+                clearInterval(interval);
+                setDisplayText(newText);
+                setIsAnimating(false);
+            }
+        }, 40);
+    };
+
+    // 🔥 SCROLL + FIXED CONTROL (SOLO PARA EL EFECTO PARALLAX)
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // 🎥 PARALLAX DEL VIDEO
-            gsap.to(videoRef.current, {
-                y: "-20%", // mueve el video hacia arriba al hacer scroll
-                ease: "none",
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true,
+
+            ScrollTrigger.create({
+                trigger: sectionRef.current,
+                start: "top top",
+                end: "bottom top",
+
+                onEnter: () => {
+                    gsap.set(fixedRef.current, {
+                        position: "fixed",
+                        top: 0,
+                        bottom: "auto"
+                    });
                 },
+
+                onLeave: () => {
+                    gsap.set(fixedRef.current, {
+                        position: "absolute",
+                        top: "auto",
+                        bottom: 0
+                    });
+                },
+
+                onEnterBack: () => {
+                    gsap.set(fixedRef.current, {
+                        position: "fixed",
+                        top: 0,
+                        bottom: "auto"
+                    });
+                },
+
+                onLeaveBack: () => {
+                    gsap.set(fixedRef.current, {
+                        position: "absolute",
+                        top: 0,
+                        bottom: "auto"
+                    });
+                }
             });
+
+            // ❌ ELIMINADO: Los ScrollTrigger que cambiaban el texto
+            // Ahora solo el setInterval controla los cambios
+
         }, sectionRef);
 
         return () => ctx.revert();
+    }, []);
+
+    // ✅ SOLO EL INTERVALO AUTOMÁTICO CAMBIA EL TEXTO
+    useEffect(() => {
+        let index = 0;
+
+        const interval = setInterval(() => {
+            index = (index + 1) % textos.length;
+            animateTextChange(textos[index]);
+        }, 10000);
+
+        return () => clearInterval(interval);
     }, []);
 
     return (
         <section ref={sectionRef} className="relative h-[200vh] bg-black">
 
             {/* 🎥 VIDEO */}
-            <div className="fixed top-0 left-0 w-full h-screen overflow-hidden">
+            <div ref={fixedRef} className="fixed top-0 left-0 w-full h-screen overflow-hidden">
                 <video
                     ref={videoRef}
-                    src="https://pub-7b894b68dd0d42b9ab25116919a8f951.r2.dev/espacio.mp4"
+                    src="https://pub-fb8ce31dbc6943a7b29fbbda76c4806f.r2.dev/Inicio/VideoWeb.mp4"
                     autoPlay
                     muted
                     loop
@@ -43,43 +129,36 @@ function Paralax() {
                     className="w-full h-[120%] object-cover"
                 />
 
-                {/* 🌑 OVERLAY */}
                 <div className="absolute inset-0 bg-black/40" />
             </div>
 
             {/* 🧠 CONTENIDO ENCIMA */}
-            <div className="relative z-10 flex flex-col items-center justify-center h-screen text-white text-center px-6">
+            <div className="relative z-10 flex flex-col items-center justify-end pb-10 h-screen text-white text-center px-6">
                 <h1 className="text-5xl md:text-7xl font-bold">
-                    Parallax con GSAP 🚀
+                    {displayText}
                 </h1>
+
                 <p className="mt-6 text-lg opacity-80 max-w-xl">
-                    Scroll para ver el efecto parallax suave y profesional.
+                    Monitoreo inteligente de temperatura con tecnología de vanguardia
                 </p>
             </div>
-            <div className="relative z-10 flex flex-col items-end justify-center h-screen text-white text-center px-6">
+
+            <div className="max-w-[80vw] relative z-10 flex flex-col items-end justify-center h-screen text-white text-center px-6">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                    Physical AI platforms that move
-                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">industries forward</span>
+                    Tecnología IoT para cadena de frío
+                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-500">
+                        control preciso en tiempo real
+                    </span>
                 </h2>
-                <p className="text-lg md:text-xl text-white/70 mb-8 max-w-2xl mx-auto md:mx-0 md:ml-auto">
-                    Transformando industrias con inteligencia artificial física
-                </p>
-                <div className="inline-block md:block">
-                    <button className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} onClick={() => window.location.href = "#contacto"}>
-                        Descubre el futuro <span className="ml-2">→</span>
-                    </button>
-                </div>
             </div>
-            {/* 📦 MÁS CONTENIDO PARA SCROLL */}
-            <div className="h-screen flex items-center justify-center text-white">
-                <h2 className="text-4xl">Sigue bajando...</h2>
-            </div>
-<div
-  className="absolute bottom-0 left-0 w-full h-[30%] pointer-events-none z-25"
-  style={{
-    background: "linear-gradient(180deg, transparent 0%, black 100%)",
-  }}
-/>
+
+
+            <div
+                className="absolute bottom-0 left-0 w-full h-[30%] pointer-events-none z-25"
+                style={{
+                    background: "linear-gradient(180deg, transparent 0%, black 100%)",
+                }}
+            />
         </section>
     );
 }
