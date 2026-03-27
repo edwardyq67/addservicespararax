@@ -1,41 +1,72 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import Cursor from "../components/Cursor";
 import Movimiento from "./movimiento/Movimiento";
 import Carrusel from "./carrusel/carrusel";
 import Paralax from "./paralax/Paralax";
 import Galeria from "./galeria/Galeria";
 import Salida from "./salida/Salida";
+import Loader from "../components/loader/Loader";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [permiso, setPermiso] = useState(false);
+
+  useEffect(() => {
+    const handleLoad = () => {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    };
+
+    if (document.readyState === "complete") {
+      handleLoad();
+    } else {
+      window.addEventListener("load", handleLoad);
+      return () => window.removeEventListener("load", handleLoad);
+    }
+  }, []);
+
   return (
-    <div>
-      <section>
-        <Paralax/>
-      </section>
-       {/* Contenedor sticky para el carrusel */}
-      <div className="relative" style={{ height: "300vh" }}> {/* Altura total para el scroll */}
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <Carrusel/>
+    <>
+      {/* ✅ LOADER SE MUESTRA MIENTRAS NO HAY PERMISO */}
+      {!permiso && (
+        <Loader isLoading={isLoading} setPermiso={setPermiso} />
+      )}
+
+      {/* ✅ CONTENIDO SOLO CUANDO YA TERMINÓ */}
+      {permiso && (
+        <div>
+          <section>
+            <Paralax />
+          </section>
+
+          {/* Carrusel sticky */}
+          <div className="relative" style={{ height: "300vh" }}>
+            <div className="sticky top-0 h-screen overflow-hidden">
+              <Carrusel />
+            </div>
+          </div>
+
+          <section>
+            <Movimiento />
+          </section>
+
+          <section>
+            <Galeria />
+          </section>
+
+          <section>
+            <Salida />
+          </section>
         </div>
-      </div>
-
-      <section>
-        <Movimiento />
-      </section>
-
-      <section>
-        <Galeria/>
-      </section>
-      
-      <section>
-        <Salida/>
-      </section>
-    </div>
+      )}
+    </>
   );
 }
