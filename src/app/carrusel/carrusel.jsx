@@ -148,7 +148,7 @@ function Carrusel() {
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-[100dvh] bg-black flex flex-col items-center justify-center overflow-hidden"
+      className=" w-full min-h-[100dvh] bg-black flex flex-col items-center justify-center overflow-hidden"
     >
       {/* NAV */}
       <div className="w-[92vw] sm:w-[90vw] flex justify-between items-center sm:items-end mb-6 sm:mb-8 flex-wrap gap-4">

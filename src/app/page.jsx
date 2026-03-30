@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-import Cursor from "../components/Cursor";
-import Movimiento from "./movimiento/Movimiento";
 import Carrusel from "./carrusel/carrusel";
 import Paralax from "./paralax/Paralax";
 import Galeria from "./galeria/Galeria";
 import Salida from "./salida/Salida";
 import Loader from "../components/loader/Loader";
+
+import { Canvas as R3fCanvas } from '@react-three/fiber';
+
+import Canvas from "./Canvas";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,19 +44,19 @@ export default function Home() {
       {/* ✅ CONTENIDO SOLO CUANDO YA TERMINÓ */}
       {permiso && (
         <div>
+
           <section>
             <Paralax />
           </section>
 
           {/* Carrusel sticky */}
-          <div className="relative" style={{ height: "300vh" }}>
+          <section className="relative" style={{ height: "300vh" }}>
             <div className="sticky top-0 h-screen overflow-hidden">
               <Carrusel />
             </div>
-          </div>
-
-          <section>
-            <Movimiento />
+          </section>
+          <section className="h-[250vh] ">
+            <Canvas />
           </section>
 
           <section>

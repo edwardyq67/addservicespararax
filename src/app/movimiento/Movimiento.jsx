@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Canvas } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Center } from "@react-three/drei";
 
+
 gsap.registerPlugin(ScrollTrigger);
 
 // 🔹 Modelo 3D
@@ -61,6 +62,7 @@ function Movimiento() {
       ref={containerRef}
       className="relative min-h-[250dvh] bg-gradient-to-b from-black via-[#050505] to-black overflow-hidden"
     >
+
       {/* 🔥 OVALO DE FONDO */}
       <div
         className="
