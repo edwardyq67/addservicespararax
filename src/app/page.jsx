@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import Movimiento from "./movimiento/Movimiento";
 import Carrusel from "./carrusel/carrusel";
 import Paralax from "./paralax/Paralax";
 import Galeria from "./galeria/Galeria";
 import Salida from "./salida/Salida";
 import Loader from "../components/loader/Loader";
-
-import { Canvas as R3fCanvas } from '@react-three/fiber';
-
-import Canvas from "./Canvas";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,7 +42,6 @@ export default function Home() {
       {/* ✅ CONTENIDO SOLO CUANDO YA TERMINÓ */}
       {permiso && (
         <div>
-
           <section>
             <Paralax />
           </section>
@@ -55,8 +52,9 @@ export default function Home() {
               <Carrusel />
             </div>
           </section>
-          <section className="h-[250vh] ">
-            <Canvas />
+
+          <section>
+            <Movimiento />
           </section>
 
           <section>

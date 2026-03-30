@@ -5,14 +5,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Canvas } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Center } from "@react-three/drei";
-
+import CanvasWrapper from "../Canvas";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // 🔹 Modelo 3D
 function Model() {
   const { scene } = useGLTF(
-    "https://pub-7b894b68dd0d42b9ab25116919a8f951.r2.dev/logofonbiepol.glb"
+    "/Mundo6.gltf"
   );
 
   return (
@@ -62,7 +62,7 @@ function Movimiento() {
       ref={containerRef}
       className="relative min-h-[250dvh] bg-gradient-to-b from-black via-[#050505] to-black overflow-hidden"
     >
-
+<CanvasWrapper/>
       {/* 🔥 OVALO DE FONDO */}
       <div
         className="

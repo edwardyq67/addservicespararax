@@ -127,7 +127,7 @@ function Paralax() {
       {/* 🧠 TEXTO */}
       <div className="relative z-10 flex flex-col items-center justify-end pb-16 sm:pb-20 h-[100dvh] text-white text-center px-4 sm:px-6">
         <div className="relative inline-block max-w-[90vw]">
-          
+
           <h1 className="
             text-2xl 
             sm:text-4xl 
