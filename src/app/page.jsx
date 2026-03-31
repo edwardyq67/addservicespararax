@@ -11,6 +11,7 @@ import Galeria from "./galeria/Galeria";
 import Salida from "./salida/Salida";
 import Loader from "../components/loader/Loader";
 
+
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
@@ -47,7 +48,7 @@ export default function Home() {
           </section>
 
           {/* Carrusel sticky */}
-          <section className="relative" style={{ height: "300vh" }}>
+          <section className="relative z-50" style={{ height: "300vh" }}>
             <div className="sticky top-0 h-screen overflow-hidden">
               <Carrusel />
             </div>

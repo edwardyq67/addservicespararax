@@ -7,21 +7,18 @@ import { FluidEffect } from '@/components/Scene3D';
 const Canvas = () => {
     return (
         <>
-            <div className="relative min-h-[250dvh] bg-black">
                 <R3fCanvas
                     style={{
-                        position: 'sticky',
+                        position: "fixed",
                         top: 0,
-                        left: 0,
-                        height: '100vh',
-
+                        height: "100vh",
+                        width: "100%",
                     }}
                 >
                     <Suspense fallback={null}>
                         <FluidEffect />
                     </Suspense>
                 </R3fCanvas>
-            </div>
 
         </>
 

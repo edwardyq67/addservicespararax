@@ -112,7 +112,7 @@ function Paralax() {
       {/* 🎥 VIDEO */}
       <div
         ref={fixedRef}
-        className="fixed top-0 left-0 w-full h-[100dvh] overflow-hidden"
+        className="fixed z-30 top-0 left-0 w-full h-[100dvh] overflow-hidden"
       >
         <video
           src="https://pub-fb8ce31dbc6943a7b29fbbda76c4806f.r2.dev/Inicio/NuevoVideoWebSmartFrost.mp4"
@@ -125,7 +125,7 @@ function Paralax() {
       </div>
 
       {/* 🧠 TEXTO */}
-      <div className="relative z-10 flex flex-col items-center justify-end pb-16 sm:pb-20 h-[100dvh] text-white text-center px-4 sm:px-6">
+      <div className="relative z-50 flex flex-col items-center justify-end pb-16 sm:pb-20 h-[100dvh] text-white text-center px-4 sm:px-6">
         <div className="relative inline-block max-w-[90vw]">
 
           <h1 className="
@@ -162,7 +162,7 @@ function Paralax() {
       </div>
 
       {/* 🔥 SEGUNDA SECCIÓN */}
-      <div className="z-50 relative max-w-[92vw] sm:max-w-[90vw] mx-auto z-10 flex flex-col items-center md:items-end justify-center h-[100dvh] text-white text-center md:text-end px-4 sm:px-6 md:px-12">
+      <div className="z-50 relative max-w-[92vw] sm:max-w-[90vw] mx-auto flex flex-col items-center md:items-end justify-center h-[100dvh] text-white text-center md:text-end px-4 sm:px-6 md:px-12">
         <div className="text-center md:text-start">
           <p className="text-xs sm:text-sm uppercase tracking-wider text-primary-500 mb-3 sm:mb-4">
             Bienvenido a SmartFrost
@@ -193,7 +193,7 @@ function Paralax() {
 
       {/* fade */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[25vh] sm:h-[100vh] pointer-events-none z-20"
+        className="absolute z-40 bottom-0 left-0 w-full h-[25vh] sm:h-[100vh] pointer-events-none z-20"
         style={{
           background: "linear-gradient(180deg, transparent 0%, black 100%)",
         }}
