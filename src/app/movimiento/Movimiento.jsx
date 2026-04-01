@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import CanvasWrapper from "../Canvas";
+import { motion } from "framer-motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* -------------------- PLANETA -------------------- */
+/* ---------------- PLANETA ---------------- */
+
 function Planet() {
   const groupRef = useRef();
   const dragging = useRef(false);
   const previousMouse = useRef([0, 0]);
+  const velocity = useRef({ x: 0, y: 0 });
 
   const texture = useMemo(() => {
     const loader = new THREE.TextureLoader();
@@ -58,13 +61,15 @@ function Planet() {
   useFrame(() => {
     shaderMaterial.uniforms.time.value += 0.01;
 
-    // Rotación automática ligera si no se arrastra
-    if (!dragging.current && groupRef.current) {
-      groupRef.current.rotation.y += 0.001;
+    if (groupRef.current && !dragging.current) {
+      groupRef.current.rotation.y += velocity.current.x + 0.001;
+      groupRef.current.rotation.x += velocity.current.y;
+
+      velocity.current.x *= 0.92;
+      velocity.current.y *= 0.92;
     }
   });
 
-  // Eventos de mouse para drag
   const onPointerDown = (e) => {
     dragging.current = true;
     previousMouse.current = [e.clientX, e.clientY];
@@ -80,11 +85,13 @@ function Planet() {
     const deltaX = e.clientX - previousMouse.current[0];
     const deltaY = e.clientY - previousMouse.current[1];
 
-    // Ajusta la sensibilidad
-    const rotationSpeed = 0.005;
+    const speed = 0.005;
 
-    groupRef.current.rotation.y += deltaX * rotationSpeed;
-    groupRef.current.rotation.x += deltaY * rotationSpeed;
+    groupRef.current.rotation.y += deltaX * speed;
+    groupRef.current.rotation.x += deltaY * speed;
+
+    velocity.current.x = deltaX * speed;
+    velocity.current.y = deltaY * speed;
 
     previousMouse.current = [e.clientX, e.clientY];
   };
@@ -95,40 +102,45 @@ function Planet() {
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerMove={onPointerMove}
-      onPointerLeave={onPointerUp} // Soltar si el mouse sale
+      onPointerLeave={onPointerUp}
     >
       <mesh material={shaderMaterial}>
         <sphereGeometry args={[2, 64, 64]} />
       </mesh>
 
-      <mesh scale={0.9}>
+      <mesh scale={1.015}>
         <sphereGeometry args={[2, 64, 64]} />
         <meshBasicMaterial
-          color="#021421"   // color sólido oscuro
+          color="#43C4F5"
+          wireframe
           transparent
-          opacity={1}       // totalmente opaco
+          opacity={0.1}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
     </group>
   );
 }
 
-/* -------------------- ESTRELLAS -------------------- */
+/* ---------------- ESTRELLAS ---------------- */
+
 function StarsBackground() {
-  const starsRef = useRef();
-  const starsCount = 5000; // Muchas estrellas
+  const starsCount = 5000;
+
   const positions = useMemo(() => {
     const pos = new Float32Array(starsCount * 3);
+
     for (let i = 0; i < starsCount; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 400;   // X
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 400; // Y
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 400; // Z
+      pos[i * 3] = (Math.random() - 0.5) * 400;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 400;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 400;
     }
+
     return pos;
   }, []);
 
   return (
-    <points ref={starsRef}>
+    <points>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -137,12 +149,14 @@ function StarsBackground() {
           itemSize={3}
         />
       </bufferGeometry>
+
       <pointsMaterial color="white" size={0.2} transparent opacity={0.7} />
     </points>
   );
 }
 
-/* -------------------- COMPONENTE PRINCIPAL -------------------- */
+/* ---------------- COMPONENTE PRINCIPAL ---------------- */
+
 function Movimiento() {
   const containerRef = useRef(null);
   const boxRef = useRef(null);
@@ -150,51 +164,56 @@ function Movimiento() {
   const section1Ref = useRef(null);
   const section2Ref = useRef(null);
 
+  const [isVisible, setIsVisible] = useState({
+    section1: false,
+    section2: false,
+  });
+
+  /* Intersection Observer */
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === section1Ref.current) {
+            setIsVisible((prev) => ({
+              ...prev,
+              section1: entry.isIntersecting,
+            }));
+          }
+
+          if (entry.target === section2Ref.current) {
+            setIsVisible((prev) => ({
+              ...prev,
+              section2: entry.isIntersecting,
+            }));
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (section1Ref.current) observer.observe(section1Ref.current);
+    if (section2Ref.current) observer.observe(section2Ref.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  /* GSAP scroll planeta */
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (!containerRef.current || !boxRef.current) return;
+      const totalScroll =
+        containerRef.current.offsetHeight - window.innerHeight;
 
-      const totalScroll = containerRef.current.offsetHeight - window.innerHeight;
-      const isMobile = window.innerWidth < 768;
-
-      const tl = gsap.timeline({
+      gsap.to(boxRef.current, {
+        x: window.innerWidth * -0.25,
+        y:  totalScroll * 0.7,
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
           end: "bottom bottom",
           scrub: true,
-          invalidateOnRefresh: true,
-        },
-        defaults: { ease: "none" },
-      });
-
-      tl.to(boxRef.current, {
-        x: isMobile ? 0 : window.innerWidth * -0.25,
-        y: totalScroll,
-        force3D: true,
-      });
-
-      /* animación sección 1 */
-      gsap.from(section1Ref.current, {
-        opacity: 0,
-        y: 80,
-        duration: 1.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: section1Ref.current,
-          start: "top 80%",
-        },
-      });
-
-      /* animación sección 2 */
-      gsap.from(section2Ref.current, {
-        opacity: 0,
-        y: 120,
-        duration: 1.4,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: section2Ref.current,
-          start: "top 80%",
         },
       });
     }, containerRef);
@@ -208,7 +227,9 @@ function Movimiento() {
       className="relative min-h-[250dvh] bg-black overflow-hidden"
     >
       <CanvasWrapper />
-      {/* ----------------- CANVAS DE FONDO ----------------- */}
+
+      {/* ESTRELLAS */}
+
       <Canvas
         camera={{ position: [0, 0, 6], fov: 60 }}
         style={{ position: "fixed", inset: 0, zIndex: 0 }}
@@ -216,71 +237,171 @@ function Movimiento() {
         <StarsBackground />
       </Canvas>
 
-      {/* ----------------- PLANETA ----------------- */}
+      {/* PLANETA */}
+
       <div
         ref={boxRef}
-        className="
-          absolute top-50 
-          left-1/2 -translate-x-1/2 
-          w-[280px] h-[280px] 
-          sm:w-[360px] sm:h-[360px] 
-          md:w-[500px] md:h-[500px]
-          lg:w-[600px] lg:h-[600px]
-          z-50
-          opacity-90
-          pointer-events-auto
-        "
+        className="absolute top-50 left-1/2 -translate-x-1/2 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] z-50"
       >
-        <Canvas
-          camera={{ position: [0, 0, 6], fov: 60 }}
-          style={{ position: "absolute", inset: 0, background: "transparent" }}
-          dpr={[1, 1.5]}
-        >
+        <Canvas camera={{ position: [0, 0, 6], fov: 60 }}>
           <ambientLight intensity={1.2} />
           <directionalLight position={[3, 3, 3]} intensity={2} />
           <Planet />
         </Canvas>
       </div>
 
-      {/* ----------------- SECCIÓN 1 ----------------- */}
-      <div
+      {/* SECCIÓN 1 */}
+
+       {/* SECCIÓN 1 CON MOTION */}
+      <motion.div
         ref={section1Ref}
+        initial={{ opacity: 0, y: 100 }}
+        animate={isVisible.section1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 100 }}
+        transition={{
+          duration: 0.8,
+          ease: "easeOut",
+          type: "spring",
+          stiffness: 100,
+          damping: 20
+        }}
         className="h-[100dvh] flex items-center justify-center relative z-20 px-4 sm:px-6"
       >
-        <div className="max-w-3xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center shadow-2xl">
-          <h3 className="text-3xl md:text-5xl font-bold text-white mb-6">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={isVisible.section1 ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="max-w-3xl w-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 sm:p-12 text-center shadow-2xl hover:shadow-primary-500/20 hover:border-white/30 transition-all duration-500"
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={isVisible.section1 ? { width: 80 } : { width: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="h-1 bg-gradient-to-r from-primary-500 to-cyan-500 rounded-full mx-auto mb-8"
+          />
+          
+          <motion.h3
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible.section1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+          >
             Diseño + Tecnología
-          </h3>
-          <p className="text-gray-400 md:text-lg">
+          </motion.h3>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible.section1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="text-gray-300 md:text-xl leading-relaxed"
+          >
             Creamos experiencias que convierten visitantes en clientes
             y marcas en referentes digitales.
-          </p>
-        </div>
-      </div>
+          </motion.p>
 
-      {/* ----------------- SECCIÓN 2 ----------------- */}
-      <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isVisible.section1 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mt-8 flex justify-center gap-4"
+          >
+            {['Innovación', 'Creatividad', 'Resultados'].map((tag, i) => (
+              <span
+                key={i}
+                className="px-4 py-2 bg-white/10 rounded-full text-sm text-white/80 border border-white/20"
+              >
+                {tag}
+              </span>
+            ))}
+          </motion.div>
+        </motion.div>
+      </motion.div>
+
+      {/* SECCIÓN 2 CON MOTION */}
+      <motion.div
         ref={section2Ref}
+        initial={{ opacity: 0, x: -50 }}
+        animate={isVisible.section2 ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+        transition={{
+          duration: 0.8,
+          ease: "easeOut",
+          type: "spring",
+          stiffness: 100,
+          damping: 20
+        }}
         className="h-[100dvh] flex items-end relative z-20 px-6 md:px-20 text-white"
       >
         <div className="grid md:grid-cols-2 gap-16 w-full max-w-7xl mx-auto">
-          <div></div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isVisible.section2 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="hidden md:block"
+          >
+            <div className="relative">
 
-          <div className="space-y-8">
-            <h2 className="text-4xl md:text-7xl font-bold leading-tight">
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={isVisible.section2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="space-y-8"
+          >
+            <motion.div
+              initial={{ width: 0 }}
+              animate={isVisible.section2 ? { width: 100 } : { width: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="h-1 bg-gradient-to-r from-primary-500 to-cyan-500 rounded-full"
+            />
+            
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
               Potencia tu <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
+              <span className="bg-gradient-to-r from-gray-200 to-gray-500 bg-clip-text text-transparent">
                 marca digital
               </span>
             </h2>
 
-            <p className="text-gray-400 md:text-xl max-w-xl">
+            <p className="text-gray-300 md:text-xl max-w-xl leading-relaxed">
               Creamos experiencias web modernas, rápidas y visualmente impactantes
               que elevan tu negocio al siguiente nivel.
             </p>
-          </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-cyan-500 rounded-full font-semibold text-white shadow-lg hover:shadow-primary-500/50 transition-all duration-300"
+            >
+              <span>Comienza ahora</span>
+              <motion.svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </motion.svg>
+            </motion.button>
+
+            <div className="flex gap-6 pt-4">
+              {['+50 Proyectos', '+30 Clientes', '5★ Valoración'].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isVisible.section2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-xl font-bold text-white">{stat.split(' ')[0]}</div>
+                  <div className="text-xs text-white/60">{stat.split(' ')[1]}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

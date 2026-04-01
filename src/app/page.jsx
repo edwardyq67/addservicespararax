@@ -10,7 +10,7 @@ import Paralax from "./paralax/Paralax";
 import Galeria from "./galeria/Galeria";
 import Salida from "./salida/Salida";
 import Loader from "../components/loader/Loader";
-
+import Proyectos from "./proyectos/Proyectos"
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,6 +64,10 @@ export default function Home() {
 
           <section>
             <Salida />
+          </section>
+
+          <section>
+            <Proyectos/>
           </section>
         </div>
       )}

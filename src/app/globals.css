@@ -19,7 +19,7 @@ html {
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
   --border: 220 13% 91%;
-  --input: 220 13% 91%;
+  --input: 220 13% 91 %;
 
   /* 🔥 Paleta basada en #43C4F5 - Azul/Cyan brillante */
   --primary-50: 197 100% 96%;

@@ -163,19 +163,55 @@ function Carrusel() {
         >
           {slides.map((slide, i) => (
             <SwiperSlide key={i}>
-              <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl group cursor-pointer">
+
+                {/* Imagen con efecto de escala al hover */}
                 <img
                   src={slide.img}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 "
                 />
 
-                {/* Esquinas */}
-                <span className="m-2 absolute top-0 left-0 w-4 sm:w-5 h-4 sm:h-5 border-t border-l border-white/40 rounded-tl-md z-20"></span>
-                <span className="m-2 absolute top-0 right-0 w-4 sm:w-5 h-4 sm:h-5 border-t border-r border-white/40 rounded-tr-md z-20"></span>
-                <span className="m-2 absolute bottom-0 left-0 w-4 sm:w-5 h-4 sm:h-5 border-b border-l border-white/40 rounded-bl-md z-20"></span>
-                <span className="m-2 absolute bottom-0 right-0 w-4 sm:w-5 h-4 sm:h-5 border-b border-r border-white/40 rounded-br-md z-20"></span>
+                {/* Gradiente mejorado - más sutil y dinámico */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+
+                {/* Overlay con efecto de brillo al hover */}
+                <div className="absolute inset-0 bg-white/0 transition-all duration-500 z-10"></div>
+
+                {/* Esquinas decorativas mejoradas */}
+                <span className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-white/60 rounded-tl-lg z-20 transition-all duration-300 group-hover:w-12 group-hover:h-12"></span>
+                <span className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-white/60 rounded-tr-lg z-20 transition-all duration-300 group-hover:w-12 group-hover:h-12"></span>
+                <span className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-white/60 rounded-bl-lg z-20 transition-all duration-300 group-hover:w-12 group-hover:h-12"></span>
+                <span className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-white/60 rounded-br-lg z-20 transition-all duration-300 group-hover:w-12 group-hover:h-12"></span>
+
+                {/* CARD TEXTO - Diseño moderno */}
+                <div className="absolute bottom-0 left-0 right-0 z-30 p-6 sm:p-8 md:p-10">
+
+
+                  {/* Título con animación */}
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight transform transition-all duration-500 group-hover:translate-x-2">
+                    {activeIndex === i ? displayText : slide.text}
+                      <div className="w-16 h-1 bg-primary-500 rounded-full mb-2 transition-all duration-500 group-hover:w-24"></div>
+
+                  </h2>
+
+                  {/* Subtítulo con diseño mejorado */}
+                  <p className="text-sm sm:text-base text-white/80 max-w-lg mb-6 transform transition-all duration-500 delay-75 group-hover:translate-x-2">
+                    {activeIndex === i ? displaySubtitle : slide.subtitle}
+                  </p>
+
+                  {/* Botón de acción (opcional) */}
+                  <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-semibold hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+                    <span>Ver proyecto</span>
+                    <svg className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+
+                </div>
+
+
               </div>
             </SwiperSlide>
           ))}
@@ -197,18 +233,7 @@ function Carrusel() {
           </button>
         </div>
 
-        {/* TEXTO */}
-        <div className="absolute -bottom-5 left-4 sm:left-10 w-[90%] sm:w-full z-30 flex flex-col items-start justify-end pb-6 sm:pb-16 pointer-events-none">
-          <h2 className="relative text-2xl sm:text-3xl md:text-4xl font-bold text-gray-50 mb-3 sm:mb-4 leading-tight py-2 rounded-md">
-            {displayText}
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-gray-50/70 mb-4 sm:mb-6">
-            {displaySubtitle}
-          </p>
-          <button className="pointer-events-auto px-6 sm:px-8 py-2 sm:py-3 bg-primary-500 text-sm sm:text-base cursor-pointer text-white rounded-full font-semibold hover:scale-105 transition-all duration-300">
-            Discover More →
-          </button>
-        </div>
+
       </div>
     </div>
   );
